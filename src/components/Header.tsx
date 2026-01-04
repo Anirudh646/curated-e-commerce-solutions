@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, ShoppingBag, Heart, Menu, X, User, LogOut } from 'lucide-react';
+import { Search, ShoppingBag, Heart, Menu, X, User, LogOut, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useStore } from '@/lib/store';
 import { useAuth } from '@/contexts/AuthContext';
+import { useAdmin } from '@/contexts/AdminContext';
 import { categories } from '@/data/products';
 import { toast } from 'sonner';
 
@@ -21,6 +22,7 @@ export function Header() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const { searchQuery, setSearchQuery, getCartCount, wishlist, selectedCategory, setSelectedCategory } = useStore();
   const { user, signOut } = useAuth();
+  const { isAdmin } = useAdmin();
   const cartCount = getCartCount();
 
   const handleSignOut = async () => {
@@ -52,6 +54,18 @@ export function Header() {
                   {category}
                 </Link>
               ))}
+              {isAdmin && (
+                <>
+                  <div className="h-px bg-border my-2" />
+                  <Link
+                    to="/admin"
+                    className="text-lg font-medium text-accent flex items-center gap-2"
+                  >
+                    <Shield className="h-5 w-5" />
+                    Admin Dashboard
+                  </Link>
+                </>
+              )}
             </nav>
           </SheetContent>
         </Sheet>
@@ -102,6 +116,15 @@ export function Header() {
             {isSearchOpen ? <X className="h-5 w-5" /> : <Search className="h-5 w-5" />}
           </Button>
 
+          {/* Admin Link (Desktop) */}
+          {isAdmin && (
+            <Link to="/admin" className="hidden md:flex">
+              <Button variant="ghost" size="icon" className="text-accent">
+                <Shield className="h-5 w-5" />
+              </Button>
+            </Link>
+          )}
+
           {/* Wishlist */}
           <Link to="/wishlist">
             <Button variant="ghost" size="icon" className="relative">
@@ -138,6 +161,9 @@ export function Header() {
               <DropdownMenuContent align="end" className="w-48">
                 <div className="px-2 py-1.5">
                   <p className="text-sm font-medium truncate">{user.email}</p>
+                  {isAdmin && (
+                    <p className="text-xs text-accent">Admin</p>
+                  )}
                 </div>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
@@ -146,6 +172,14 @@ export function Header() {
                     My Account
                   </Link>
                 </DropdownMenuItem>
+                {isAdmin && (
+                  <DropdownMenuItem asChild>
+                    <Link to="/admin" className="flex items-center">
+                      <Shield className="h-4 w-4 mr-2" />
+                      Admin Dashboard
+                    </Link>
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleSignOut} className="text-destructive focus:text-destructive">
                   <LogOut className="h-4 w-4 mr-2" />

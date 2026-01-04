@@ -4,12 +4,17 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
+import { AdminProvider } from "@/contexts/AdminContext";
 import Index from "./pages/Index";
 import ProductDetail from "./pages/ProductDetail";
 import Cart from "./pages/Cart";
 import Wishlist from "./pages/Wishlist";
 import Auth from "./pages/Auth";
 import Profile from "./pages/Profile";
+import AdminDashboard from "./pages/admin/Dashboard";
+import AdminProducts from "./pages/admin/Products";
+import AdminOrders from "./pages/admin/Orders";
+import AdminDiscounts from "./pages/admin/Discounts";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -72,6 +77,11 @@ const AppRoutes = () => (
         </ProtectedRoute>
       }
     />
+    {/* Admin Routes */}
+    <Route path="/admin" element={<AdminDashboard />} />
+    <Route path="/admin/products" element={<AdminProducts />} />
+    <Route path="/admin/orders" element={<AdminOrders />} />
+    <Route path="/admin/discounts" element={<AdminDiscounts />} />
     <Route path="*" element={<NotFound />} />
   </Routes>
 );
@@ -83,7 +93,9 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <AuthProvider>
-          <AppRoutes />
+          <AdminProvider>
+            <AppRoutes />
+          </AdminProvider>
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
