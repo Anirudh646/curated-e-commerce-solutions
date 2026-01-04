@@ -1,17 +1,32 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, ShoppingBag, Heart, Menu, X, User } from 'lucide-react';
+import { Search, ShoppingBag, Heart, Menu, X, User, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Badge } from '@/components/ui/badge';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { useStore } from '@/lib/store';
+import { useAuth } from '@/contexts/AuthContext';
 import { categories } from '@/data/products';
+import { toast } from 'sonner';
 
 export function Header() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const { searchQuery, setSearchQuery, getCartCount, wishlist, selectedCategory, setSelectedCategory } = useStore();
+  const { user, signOut } = useAuth();
   const cartCount = getCartCount();
+
+  const handleSignOut = async () => {
+    await signOut();
+    toast.success('Signed out successfully');
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -112,9 +127,39 @@ export function Header() {
           </Link>
 
           {/* User */}
-          <Button variant="ghost" size="icon">
-            <User className="h-5 w-5" />
-          </Button>
+          {user ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="relative">
+                  <User className="h-5 w-5" />
+                  <span className="absolute -bottom-1 -right-1 h-2.5 w-2.5 bg-success rounded-full border-2 border-background" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <div className="px-2 py-1.5">
+                  <p className="text-sm font-medium truncate">{user.email}</p>
+                </div>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link to="/profile" className="flex items-center">
+                    <User className="h-4 w-4 mr-2" />
+                    My Account
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleSignOut} className="text-destructive focus:text-destructive">
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Sign Out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <Link to="/auth">
+              <Button variant="ghost" size="icon">
+                <User className="h-5 w-5" />
+              </Button>
+            </Link>
+          )}
         </div>
       </div>
     </header>
