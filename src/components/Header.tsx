@@ -13,17 +13,18 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useStore } from '@/lib/store';
+import { useShopifyCartStore } from '@/stores/shopifyCartStore';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAdmin } from '@/contexts/AdminContext';
-import { categories } from '@/data/products';
 import { toast } from 'sonner';
 
 export function Header() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const { searchQuery, setSearchQuery, getCartCount, wishlist, selectedCategory, setSelectedCategory } = useStore();
+  const { wishlist } = useStore();
+  const { getCartCount: getShopifyCartCount } = useShopifyCartStore();
   const { user, signOut } = useAuth();
   const { isAdmin } = useAdmin();
-  const cartCount = getCartCount();
+  const cartCount = getShopifyCartCount();
 
   const handleSignOut = async () => {
     await signOut();
@@ -42,18 +43,18 @@ export function Header() {
           </SheetTrigger>
           <SheetContent side="left" className="w-[300px] bg-background">
             <nav className="flex flex-col gap-4 mt-8">
-              {categories.map((category) => (
-                <Link
-                  key={category}
-                  to="/"
-                  onClick={() => setSelectedCategory(category)}
-                  className={`text-lg font-medium transition-colors hover:text-accent ${
-                    selectedCategory === category ? 'text-accent' : 'text-foreground'
-                  }`}
-                >
-                  {category}
-                </Link>
-              ))}
+              <Link
+                to="/"
+                className="text-lg font-medium transition-colors hover:text-accent text-foreground"
+              >
+                Home
+              </Link>
+              <Link
+                to="/cart"
+                className="text-lg font-medium transition-colors hover:text-accent text-foreground"
+              >
+                Cart
+              </Link>
               {isAdmin && (
                 <>
                   <div className="h-px bg-border my-2" />
@@ -78,30 +79,28 @@ export function Header() {
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center gap-6">
-          {categories.map((category) => (
-            <Link
-              key={category}
-              to="/"
-              onClick={() => setSelectedCategory(category)}
-              className={`text-sm font-medium transition-colors hover:text-accent ${
-                selectedCategory === category ? 'text-accent' : 'text-muted-foreground'
-              }`}
-            >
-              {category}
-            </Link>
-          ))}
+          <Link
+            to="/"
+            className="text-sm font-medium transition-colors hover:text-accent text-muted-foreground"
+          >
+            Home
+          </Link>
+          <Link
+            to="/cart"
+            className="text-sm font-medium transition-colors hover:text-accent text-muted-foreground"
+          >
+            Cart
+          </Link>
         </nav>
 
         {/* Actions */}
         <div className="flex items-center gap-2">
-          {/* Search */}
-          <div className={`${isSearchOpen ? 'flex' : 'hidden'} md:flex items-center`}>
+          {/* Search - hidden for now since Shopify has its own search */}
+          <div className={`${isSearchOpen ? 'flex' : 'hidden'} md:hidden items-center`}>
             <div className="relative">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 placeholder="Search products..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-[200px] pl-9 bg-secondary border-0"
               />
             </div>
