@@ -7,8 +7,9 @@ import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { AdminProvider } from "@/contexts/AdminContext";
 import Index from "./pages/Index";
 import ProductDetail from "./pages/ProductDetail";
-import Cart from "./pages/Cart";
+import ShopifyCart from "./pages/ShopifyCart";
 import Wishlist from "./pages/Wishlist";
+import ShopifyProductDetail from "./pages/ShopifyProductDetail";
 import Auth from "./pages/Auth";
 import Profile from "./pages/Profile";
 import AdminDashboard from "./pages/admin/Dashboard";
@@ -58,8 +59,8 @@ function AuthRoute({ children }: { children: React.ReactNode }) {
 const AppRoutes = () => (
   <Routes>
     <Route path="/" element={<Index />} />
-    <Route path="/product/:id" element={<ProductDetail />} />
-    <Route path="/cart" element={<Cart />} />
+    <Route path="/product/:handle" element={<ShopifyProductDetail />} />
+    <Route path="/cart" element={<ShopifyCart />} />
     <Route path="/wishlist" element={<Wishlist />} />
     <Route
       path="/auth"
