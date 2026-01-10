@@ -8,8 +8,10 @@ import { AdminProvider } from "@/contexts/AdminContext";
 import Index from "./pages/Index";
 import ProductDetail from "./pages/ProductDetail";
 import ShopifyCart from "./pages/ShopifyCart";
+import LocalCart from "./pages/LocalCart";
 import Wishlist from "./pages/Wishlist";
 import ShopifyProductDetail from "./pages/ShopifyProductDetail";
+import LocalProductDetail from "./pages/LocalProductDetail";
 import Auth from "./pages/Auth";
 import Profile from "./pages/Profile";
 import AdminDashboard from "./pages/admin/Dashboard";
@@ -60,7 +62,9 @@ const AppRoutes = () => (
   <Routes>
     <Route path="/" element={<Index />} />
     <Route path="/product/:handle" element={<ShopifyProductDetail />} />
-    <Route path="/cart" element={<ShopifyCart />} />
+    <Route path="/local-product/:id" element={<LocalProductDetail />} />
+    <Route path="/shopify-cart" element={<ShopifyCart />} />
+    <Route path="/cart" element={<LocalCart />} />
     <Route path="/wishlist" element={<Wishlist />} />
     <Route
       path="/auth"

@@ -2,7 +2,7 @@ import { PromoBanner } from '@/components/PromoBanner';
 import { Header } from '@/components/Header';
 import { HeroSection } from '@/components/HeroSection';
 import { TrustBadges } from '@/components/TrustBadges';
-import { ShopifyProducts } from '@/components/ShopifyProducts';
+import { LocalProducts } from '@/components/LocalProducts';
 import { CategoryShowcase } from '@/components/CategoryShowcase';
 import { Footer } from '@/components/Footer';
 
@@ -14,7 +14,7 @@ const Index = () => {
       <main>
         <HeroSection />
         <TrustBadges />
-        <ShopifyProducts />
+        <LocalProducts />
         <CategoryShowcase />
       </main>
       <Footer />
