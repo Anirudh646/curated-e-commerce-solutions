@@ -28,6 +28,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { AdminLayout } from '@/components/admin/AdminLayout';
+import { ImageGalleryUpload } from '@/components/ImageGalleryUpload';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
@@ -45,6 +46,14 @@ interface Product {
   created_at: string;
 }
 
+interface ProductImage {
+  id: string;
+  product_id: string;
+  image_url: string;
+  display_order: number;
+  alt_text: string | null;
+}
+
 const categories = ['Electronics', 'Fashion', 'Accessories', 'Home', 'Sports'];
 
 export default function AdminProducts() {
@@ -54,9 +63,7 @@ export default function AdminProducts() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [saving, setSaving] = useState(false);
-  const [uploading, setUploading] = useState(false);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [galleryImages, setGalleryImages] = useState<string[]>([]);
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -103,10 +110,10 @@ export default function AdminProducts() {
       is_active: true,
     });
     setEditingProduct(null);
-    setImagePreview(null);
+    setGalleryImages([]);
   };
 
-  const openEditDialog = (product: Product) => {
+  const openEditDialog = async (product: Product) => {
     setEditingProduct(product);
     setFormData({
       name: product.name,
@@ -119,63 +126,21 @@ export default function AdminProducts() {
       badge: product.badge || '',
       is_active: product.is_active,
     });
-    setImagePreview(product.image_url || null);
+    
+    // Fetch gallery images
+    const { data: images } = await supabase
+      .from('product_images')
+      .select('image_url')
+      .eq('product_id', product.id)
+      .order('display_order', { ascending: true });
+    
+    const allImages = [
+      ...(product.image_url ? [product.image_url] : []),
+      ...(images?.map(img => img.image_url) || []),
+    ];
+    setGalleryImages(allImages);
     setDialogOpen(true);
   };
-
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    // Validate file type
-    if (!file.type.startsWith('image/')) {
-      toast.error('Please select an image file');
-      return;
-    }
-
-    // Validate file size (max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error('Image must be less than 5MB');
-      return;
-    }
-
-    setUploading(true);
-
-    try {
-      // Create unique filename
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from('product-images')
-        .upload(fileName, file);
-
-      if (uploadError) throw uploadError;
-
-      // Get public URL
-      const { data: { publicUrl } } = supabase.storage
-        .from('product-images')
-        .getPublicUrl(fileName);
-
-      setFormData({ ...formData, image_url: publicUrl });
-      setImagePreview(publicUrl);
-      toast.success('Image uploaded successfully');
-    } catch (error: any) {
-      console.error('Error uploading image:', error);
-      toast.error(error.message || 'Failed to upload image');
-    } finally {
-      setUploading(false);
-    }
-  };
-
-  const removeImage = () => {
-    setFormData({ ...formData, image_url: '' });
-    setImagePreview(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
-  };
-
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -188,11 +153,13 @@ export default function AdminProducts() {
         price: parseFloat(formData.price),
         original_price: formData.original_price ? parseFloat(formData.original_price) : null,
         category: formData.category,
-        image_url: formData.image_url || null,
+        image_url: galleryImages[0] || null, // First image is main
         stock: parseInt(formData.stock) || 0,
         badge: formData.badge || null,
         is_active: formData.is_active,
       };
+
+      let productId: string;
 
       if (editingProduct) {
         const { error } = await supabase
@@ -201,14 +168,38 @@ export default function AdminProducts() {
           .eq('id', editingProduct.id);
 
         if (error) throw error;
+        productId = editingProduct.id;
         toast.success('Product updated successfully');
       } else {
-        const { error } = await supabase
+        const { data, error } = await supabase
           .from('products')
-          .insert(productData);
+          .insert(productData)
+          .select()
+          .single();
 
         if (error) throw error;
+        productId = data.id;
         toast.success('Product created successfully');
+      }
+
+      // Handle gallery images (skip first one as it's the main image)
+      if (galleryImages.length > 1) {
+        // Delete existing gallery images
+        await supabase
+          .from('product_images')
+          .delete()
+          .eq('product_id', productId);
+
+        // Insert new gallery images
+        const galleryInserts = galleryImages.slice(1).map((url, index) => ({
+          product_id: productId,
+          image_url: url,
+          display_order: index,
+        }));
+
+        if (galleryInserts.length > 0) {
+          await supabase.from('product_images').insert(galleryInserts);
+        }
       }
 
       setDialogOpen(false);
@@ -345,53 +336,12 @@ export default function AdminProducts() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Product Image</Label>
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageUpload}
-                    className="hidden"
+                  <Label>Product Images</Label>
+                  <ImageGalleryUpload
+                    images={galleryImages}
+                    onImagesChange={setGalleryImages}
+                    maxImages={5}
                   />
-                  
-                  {imagePreview ? (
-                    <div className="relative inline-block">
-                      <img
-                        src={imagePreview}
-                        alt="Product preview"
-                        className="h-32 w-32 object-cover rounded-md border border-border"
-                      />
-                      <Button
-                        type="button"
-                        variant="destructive"
-                        size="icon"
-                        className="absolute -top-2 -right-2 h-6 w-6"
-                        onClick={removeImage}
-                      >
-                        <X className="h-3 w-3" />
-                      </Button>
-                    </div>
-                  ) : (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => fileInputRef.current?.click()}
-                      disabled={uploading}
-                      className="w-full h-32 border-dashed"
-                    >
-                      {uploading ? (
-                        <>
-                          <Loader2 className="h-5 w-5 mr-2 animate-spin" />
-                          Uploading...
-                        </>
-                      ) : (
-                        <>
-                          <Upload className="h-5 w-5 mr-2" />
-                          Click to upload image
-                        </>
-                      )}
-                    </Button>
-                  )}
                 </div>
 
                 <div className="space-y-2">
