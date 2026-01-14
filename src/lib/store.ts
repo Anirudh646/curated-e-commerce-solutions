@@ -21,9 +21,24 @@ export interface CartItem extends Product {
   selectedVariant?: { color?: string; size?: string };
 }
 
+export interface RecentlyViewedProduct {
+  id: string;
+  name: string;
+  price: number;
+  original_price?: number | null;
+  image_url?: string | null;
+  category: string;
+  rating?: number | null;
+  reviews_count?: number | null;
+  badge?: string | null;
+  stock: number;
+  viewedAt: number;
+}
+
 interface StoreState {
   cart: CartItem[];
   wishlist: Product[];
+  recentlyViewed: RecentlyViewedProduct[];
   searchQuery: string;
   selectedCategory: string;
   addToCart: (product: Product, variant?: { color?: string; size?: string }) => void;
@@ -32,17 +47,21 @@ interface StoreState {
   clearCart: () => void;
   toggleWishlist: (product: Product) => void;
   isInWishlist: (productId: string) => boolean;
+  addToRecentlyViewed: (product: RecentlyViewedProduct) => void;
   setSearchQuery: (query: string) => void;
   setSelectedCategory: (category: string) => void;
   getCartTotal: () => number;
   getCartCount: () => number;
 }
 
+const MAX_RECENTLY_VIEWED = 10;
+
 export const useStore = create<StoreState>()(
   persist(
     (set, get) => ({
       cart: [],
       wishlist: [],
+      recentlyViewed: [],
       searchQuery: '',
       selectedCategory: 'All',
 
@@ -95,6 +114,17 @@ export const useStore = create<StoreState>()(
 
       isInWishlist: (productId) => {
         return get().wishlist.some((item) => item.id === productId);
+      },
+
+      addToRecentlyViewed: (product) => {
+        set((state) => {
+          // Remove if already exists
+          const filtered = state.recentlyViewed.filter((p) => p.id !== product.id);
+          // Add to beginning with timestamp
+          const updated = [{ ...product, viewedAt: Date.now() }, ...filtered];
+          // Keep only max items
+          return { recentlyViewed: updated.slice(0, MAX_RECENTLY_VIEWED) };
+        });
       },
 
       setSearchQuery: (query) => set({ searchQuery: query }),

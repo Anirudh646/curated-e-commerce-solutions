@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
+import { ImageZoom } from '@/components/ImageZoom';
+import { RecentlyViewed } from '@/components/RecentlyViewed';
 import { supabase } from '@/integrations/supabase/client';
 import { useStore } from '@/lib/store';
 import { useAuth } from '@/contexts/AuthContext';
@@ -40,7 +42,7 @@ export default function LocalProductDetail() {
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
   
-  const { toggleWishlist, isInWishlist, addToCart } = useStore();
+  const { toggleWishlist, isInWishlist, addToCart, addToRecentlyViewed } = useStore();
   const { user } = useAuth();
 
   useEffect(() => {
@@ -64,6 +66,23 @@ export default function LocalProductDetail() {
         if (productError) throw productError;
         setProduct(productData);
 
+        // Add to recently viewed
+        if (productData) {
+          addToRecentlyViewed({
+            id: productData.id,
+            name: productData.name,
+            price: productData.price,
+            original_price: productData.original_price,
+            image_url: productData.image_url,
+            category: productData.category,
+            rating: productData.rating,
+            reviews_count: productData.reviews_count,
+            badge: productData.badge,
+            stock: productData.stock,
+            viewedAt: Date.now(),
+          });
+        }
+
         // Fetch product images
         const { data: imagesData } = await supabase
           .from('product_images')
@@ -80,7 +99,7 @@ export default function LocalProductDetail() {
     }
 
     loadProduct();
-  }, [id]);
+  }, [id, addToRecentlyViewed]);
 
   if (loading) {
     return (
@@ -184,10 +203,10 @@ export default function LocalProductDetail() {
           <div className="space-y-4">
             <div className="relative aspect-square overflow-hidden bg-secondary">
               {currentImage ? (
-                <img
+                <ImageZoom
                   src={currentImage}
                   alt={product.name}
-                  className="h-full w-full object-cover"
+                  className="h-full w-full"
                 />
               ) : (
                 <div className="h-full w-full flex items-center justify-center text-muted-foreground">
@@ -195,7 +214,7 @@ export default function LocalProductDetail() {
                 </div>
               )}
               {product.badge && (
-                <span className="absolute top-4 left-4 bg-accent text-accent-foreground px-3 py-1 text-sm font-medium">
+                <span className="absolute top-4 left-4 bg-accent text-accent-foreground px-3 py-1 text-sm font-medium pointer-events-none">
                   {product.badge}
                 </span>
               )}
@@ -333,6 +352,10 @@ export default function LocalProductDetail() {
           </div>
         </div>
       </main>
+      
+      {/* Recently Viewed Section */}
+      <RecentlyViewed />
+      
       <Footer />
     </div>
   );
