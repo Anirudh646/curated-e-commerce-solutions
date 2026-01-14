@@ -12,6 +12,7 @@ import LocalCart from "./pages/LocalCart";
 import Wishlist from "./pages/Wishlist";
 import ShopifyProductDetail from "./pages/ShopifyProductDetail";
 import LocalProductDetail from "./pages/LocalProductDetail";
+import CategoryPage from "./pages/CategoryPage";
 import Auth from "./pages/Auth";
 import Profile from "./pages/Profile";
 import AdminDashboard from "./pages/admin/Dashboard";
@@ -61,6 +62,7 @@ function AuthRoute({ children }: { children: React.ReactNode }) {
 const AppRoutes = () => (
   <Routes>
     <Route path="/" element={<Index />} />
+    <Route path="/category/:category" element={<CategoryPage />} />
     <Route path="/product/:handle" element={<ShopifyProductDetail />} />
     <Route path="/local-product/:id" element={<LocalProductDetail />} />
     <Route path="/shopify-cart" element={<ShopifyCart />} />
