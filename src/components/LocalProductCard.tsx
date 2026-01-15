@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { QuickViewModal } from '@/components/QuickViewModal';
+import { CompareButton } from '@/components/CompareButton';
 
 interface LocalProduct {
   id: string;
@@ -167,6 +168,21 @@ export function LocalProductCard({ product, onImageClick }: LocalProductCardProp
             >
               <Eye className="h-4 w-4" />
             </Button>
+            <CompareButton
+              product={{
+                id: product.id,
+                name: product.name,
+                price: product.price,
+                original_price: product.original_price,
+                image_url: product.image_url || product.images?.[0],
+                category: product.category,
+                rating: product.rating,
+                reviews_count: product.reviews_count,
+                badge: product.badge,
+                stock: product.stock,
+              }}
+              className="h-9 w-9 bg-background/90 backdrop-blur hover:bg-accent hover:text-accent-foreground"
+            />
             <Button
               size="icon"
               variant="secondary"

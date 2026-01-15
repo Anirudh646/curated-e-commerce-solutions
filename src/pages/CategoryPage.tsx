@@ -4,6 +4,8 @@ import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { LocalProductCard } from '@/components/LocalProductCard';
 import { ProductFilters, FilterState } from '@/components/ProductFilters';
+import { ProductComparison } from '@/components/ProductComparison';
+import { CompareFloatingBar } from '@/components/CompareFloatingBar';
 import { supabase } from '@/integrations/supabase/client';
 import { Loader2, Package, ChevronRight } from 'lucide-react';
 import {
@@ -269,6 +271,8 @@ export default function CategoryPage() {
         </section>
       </main>
       <Footer />
+      <CompareFloatingBar />
+      <ProductComparison />
     </div>
   );
 }
