@@ -6,6 +6,8 @@ import { FeaturedCarousel } from '@/components/FeaturedCarousel';
 import { LocalProducts } from '@/components/LocalProducts';
 import { CategoryShowcase } from '@/components/CategoryShowcase';
 import { Footer } from '@/components/Footer';
+import { ProductComparison } from '@/components/ProductComparison';
+import { CompareFloatingBar } from '@/components/CompareFloatingBar';
 
 const Index = () => {
   return (
@@ -20,6 +22,8 @@ const Index = () => {
         <CategoryShowcase />
       </main>
       <Footer />
+      <CompareFloatingBar />
+      <ProductComparison />
     </div>
   );
 };

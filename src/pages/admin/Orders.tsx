@@ -80,6 +80,24 @@ export default function AdminOrders() {
         .eq('id', orderId);
 
       if (error) throw error;
+
+      // Get order details for shipping email
+      const order = orders.find(o => o.id === orderId);
+      if (order && order.profiles?.email && ['processing', 'shipped', 'delivered'].includes(newStatus)) {
+        try {
+          await supabase.functions.invoke('send-shipping-update', {
+            body: {
+              email: order.profiles.email,
+              customerName: order.profiles.full_name || 'Customer',
+              orderId: order.id,
+              status: newStatus,
+            },
+          });
+        } catch (emailErr) {
+          console.error('Failed to send shipping update email:', emailErr);
+        }
+      }
+
       toast.success('Order status updated');
       fetchOrders();
     } catch (error: any) {

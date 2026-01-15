@@ -7,6 +7,8 @@ import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { ImageZoom } from '@/components/ImageZoom';
 import { RecentlyViewed } from '@/components/RecentlyViewed';
+import { ProductReviews } from '@/components/ProductReviews';
+import { CompareButton } from '@/components/CompareButton';
 import { supabase } from '@/integrations/supabase/client';
 import { useStore } from '@/lib/store';
 import { useAuth } from '@/contexts/AuthContext';
@@ -332,6 +334,21 @@ export default function LocalProductDetail() {
               >
                 <Heart className={`h-5 w-5 ${inWishlist ? 'fill-accent text-accent' : ''}`} />
               </Button>
+              <CompareButton
+                product={{
+                  id: product.id,
+                  name: product.name,
+                  price: product.price,
+                  original_price: product.original_price,
+                  image_url: product.image_url,
+                  category: product.category,
+                  rating: product.rating,
+                  reviews_count: product.reviews_count,
+                  badge: product.badge,
+                  stock: product.stock,
+                }}
+                variant="full"
+              />
             </div>
 
             {/* Features */}
@@ -350,6 +367,11 @@ export default function LocalProductDetail() {
               </div>
             </div>
           </div>
+        </div>
+
+        {/* Reviews Section */}
+        <div className="mt-16">
+          <ProductReviews productId={product.id} />
         </div>
       </main>
       
