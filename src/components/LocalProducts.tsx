@@ -39,6 +39,9 @@ export function LocalProducts() {
     category: 'all',
     priceRange: [0, 50000],
     sortBy: 'newest',
+    minRating: 0,
+    inStockOnly: false,
+    brand: 'all',
   });
 
   useEffect(() => {

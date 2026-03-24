@@ -60,6 +60,9 @@ export default function CategoryPage() {
     category: 'all',
     priceRange: [0, 100000],
     sortBy: 'newest',
+    minRating: 0,
+    inStockOnly: false,
+    brand: 'all',
   });
 
   const decodedCategory = category ? decodeURIComponent(category) : '';
