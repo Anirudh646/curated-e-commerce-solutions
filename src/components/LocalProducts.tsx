@@ -39,6 +39,9 @@ export function LocalProducts() {
     category: 'all',
     priceRange: [0, 50000],
     sortBy: 'newest',
+    minRating: 0,
+    inStockOnly: false,
+    brand: 'all',
   });
 
   useEffect(() => {
@@ -66,6 +69,15 @@ export function LocalProducts() {
   const categories = useMemo(() => {
     const cats = [...new Set(products.map(p => p.category))];
     return cats.sort();
+  }, [products]);
+
+  const brands = useMemo(() => {
+    const brandSet = new Set<string>();
+    products.forEach(p => {
+      const firstWord = p.name.split(' ')[0];
+      if (firstWord) brandSet.add(firstWord);
+    });
+    return [...brandSet].sort().slice(0, 50);
   }, [products]);
 
   const maxPrice = useMemo(() => {
@@ -96,6 +108,21 @@ export function LocalProducts() {
       p.price >= filters.priceRange[0] && p.price <= filters.priceRange[1]
     );
 
+    // Rating filter
+    if (filters.minRating > 0) {
+      result = result.filter(p => (p.rating || 0) >= filters.minRating);
+    }
+
+    // In stock filter
+    if (filters.inStockOnly) {
+      result = result.filter(p => p.stock > 0);
+    }
+
+    // Brand filter
+    if (filters.brand !== 'all') {
+      result = result.filter(p => p.name.startsWith(filters.brand));
+    }
+
     // Sorting
     switch (filters.sortBy) {
       case 'price-low':
@@ -109,6 +136,13 @@ export function LocalProducts() {
         break;
       case 'rating':
         result.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+        break;
+      case 'discount':
+        result.sort((a, b) => {
+          const discA = a.original_price ? (a.original_price - a.price) / a.original_price : 0;
+          const discB = b.original_price ? (b.original_price - b.price) / b.original_price : 0;
+          return discB - discA;
+        });
         break;
       case 'newest':
       default:
@@ -210,6 +244,7 @@ export function LocalProducts() {
           onFiltersChange={setFilters}
           categories={categories}
           maxPrice={maxPrice}
+          brands={brands}
         />
 
         {paginatedProducts.length === 0 ? (
