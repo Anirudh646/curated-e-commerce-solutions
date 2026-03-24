@@ -239,6 +239,7 @@ export default function CategoryPage() {
                   onFiltersChange={(newFilters) => setFilters({ ...newFilters, category: 'all' })}
                   categories={[]}
                   maxPrice={maxPrice}
+                  brands={brands}
                 />
 
                 {paginatedProducts.length === 0 ? (
