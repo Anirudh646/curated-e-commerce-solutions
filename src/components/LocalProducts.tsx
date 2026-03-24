@@ -244,6 +244,7 @@ export function LocalProducts() {
           onFiltersChange={setFilters}
           categories={categories}
           maxPrice={maxPrice}
+          brands={brands}
         />
 
         {paginatedProducts.length === 0 ? (
