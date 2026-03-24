@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Search, SlidersHorizontal, X } from 'lucide-react';
+import { Search, SlidersHorizontal, X, Star } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import {
@@ -18,12 +18,16 @@ import {
 } from '@/components/ui/sheet';
 import { Slider } from '@/components/ui/slider';
 import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
 
 export interface FilterState {
   search: string;
   category: string;
   priceRange: [number, number];
   sortBy: string;
+  minRating: number;
+  inStockOnly: boolean;
+  brand: string;
 }
 
 interface ProductFiltersProps {
@@ -31,9 +35,10 @@ interface ProductFiltersProps {
   onFiltersChange: (filters: FilterState) => void;
   categories: string[];
   maxPrice: number;
+  brands?: string[];
 }
 
-export function ProductFilters({ filters, onFiltersChange, categories, maxPrice }: ProductFiltersProps) {
+export function ProductFilters({ filters, onFiltersChange, categories, maxPrice, brands = [] }: ProductFiltersProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const updateFilter = <K extends keyof FilterState>(key: K, value: FilterState[K]) => {
@@ -46,6 +51,9 @@ export function ProductFilters({ filters, onFiltersChange, categories, maxPrice 
       category: 'all',
       priceRange: [0, maxPrice],
       sortBy: 'newest',
+      minRating: 0,
+      inStockOnly: false,
+      brand: 'all',
     });
   };
 
@@ -54,7 +62,10 @@ export function ProductFilters({ filters, onFiltersChange, categories, maxPrice 
     filters.category !== 'all' ||
     filters.priceRange[0] > 0 ||
     filters.priceRange[1] < maxPrice ||
-    filters.sortBy !== 'newest';
+    filters.sortBy !== 'newest' ||
+    filters.minRating > 0 ||
+    filters.inStockOnly ||
+    filters.brand !== 'all';
 
   const FilterContent = () => (
     <div className="space-y-6">
@@ -74,9 +85,27 @@ export function ProductFilters({ filters, onFiltersChange, categories, maxPrice 
         </Select>
       </div>
 
+      {/* Brand */}
+      {brands.length > 0 && (
+        <div className="space-y-2">
+          <Label>Brand</Label>
+          <Select value={filters.brand} onValueChange={(v) => updateFilter('brand', v)}>
+            <SelectTrigger>
+              <SelectValue placeholder="All Brands" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Brands</SelectItem>
+              {brands.map((brand) => (
+                <SelectItem key={brand} value={brand}>{brand}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      )}
+
       {/* Price Range */}
       <div className="space-y-3">
-        <Label>Price Range: ₹{filters.priceRange[0]} - ₹{filters.priceRange[1]}</Label>
+        <Label>Price Range: ₹{filters.priceRange[0].toLocaleString('en-IN')} - ₹{filters.priceRange[1].toLocaleString('en-IN')}</Label>
         <Slider
           value={filters.priceRange}
           onValueChange={(v) => updateFilter('priceRange', v as [number, number])}
@@ -85,6 +114,38 @@ export function ProductFilters({ filters, onFiltersChange, categories, maxPrice 
           step={100}
           className="mt-2"
         />
+      </div>
+
+      {/* Minimum Rating */}
+      <div className="space-y-3">
+        <Label>Minimum Rating</Label>
+        <div className="flex gap-2">
+          {[0, 3, 3.5, 4, 4.5].map((rating) => (
+            <Button
+              key={rating}
+              variant={filters.minRating === rating ? "default" : "outline"}
+              size="sm"
+              onClick={() => updateFilter('minRating', rating)}
+              className="text-xs"
+            >
+              {rating === 0 ? 'Any' : (
+                <span className="flex items-center gap-0.5">
+                  {rating}+ <Star className="h-3 w-3 fill-current" />
+                </span>
+              )}
+            </Button>
+          ))}
+        </div>
+      </div>
+
+      {/* In Stock Only */}
+      <div className="flex items-center space-x-2">
+        <Checkbox
+          id="inStock"
+          checked={filters.inStockOnly}
+          onCheckedChange={(checked) => updateFilter('inStockOnly', checked === true)}
+        />
+        <Label htmlFor="inStock" className="cursor-pointer">In Stock Only</Label>
       </div>
 
       {/* Sort */}
@@ -100,6 +161,7 @@ export function ProductFilters({ filters, onFiltersChange, categories, maxPrice 
             <SelectItem value="price-high">Price: High to Low</SelectItem>
             <SelectItem value="popular">Most Popular</SelectItem>
             <SelectItem value="rating">Highest Rated</SelectItem>
+            <SelectItem value="discount">Biggest Discount</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -107,7 +169,7 @@ export function ProductFilters({ filters, onFiltersChange, categories, maxPrice 
       {hasActiveFilters && (
         <Button variant="outline" onClick={clearFilters} className="w-full">
           <X className="h-4 w-4 mr-2" />
-          Clear Filters
+          Clear All Filters
         </Button>
       )}
     </div>
@@ -115,12 +177,11 @@ export function ProductFilters({ filters, onFiltersChange, categories, maxPrice 
 
   return (
     <div className="mb-8 space-y-4">
-      {/* Search and Mobile Filter Toggle */}
       <div className="flex gap-3">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
-            placeholder="Search products..."
+            placeholder="Search products, brands..."
             value={filters.search}
             onChange={(e) => updateFilter('search', e.target.value)}
             className="pl-10"
@@ -141,6 +202,20 @@ export function ProductFilters({ filters, onFiltersChange, categories, maxPrice 
             </SelectContent>
           </Select>
 
+          {brands.length > 0 && (
+            <Select value={filters.brand} onValueChange={(v) => updateFilter('brand', v)}>
+              <SelectTrigger className="w-[140px]">
+                <SelectValue placeholder="Brand" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Brands</SelectItem>
+                {brands.slice(0, 20).map((brand) => (
+                  <SelectItem key={brand} value={brand}>{brand}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
+
           <Select value={filters.sortBy} onValueChange={(v) => updateFilter('sortBy', v)}>
             <SelectTrigger className="w-[160px]">
               <SelectValue />
@@ -151,6 +226,7 @@ export function ProductFilters({ filters, onFiltersChange, categories, maxPrice 
               <SelectItem value="price-high">Price: High to Low</SelectItem>
               <SelectItem value="popular">Most Popular</SelectItem>
               <SelectItem value="rating">Highest Rated</SelectItem>
+              <SelectItem value="discount">Biggest Discount</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -158,8 +234,11 @@ export function ProductFilters({ filters, onFiltersChange, categories, maxPrice 
         {/* Mobile Filter Sheet */}
         <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
           <SheetTrigger asChild>
-            <Button variant="outline" size="icon" className="md:hidden">
+            <Button variant="outline" size="icon" className="md:hidden relative">
               <SlidersHorizontal className="h-4 w-4" />
+              {hasActiveFilters && (
+                <span className="absolute -top-1 -right-1 h-3 w-3 bg-primary rounded-full" />
+              )}
             </Button>
           </SheetTrigger>
           <SheetContent side="right" className="w-[300px]">
@@ -188,6 +267,30 @@ export function ProductFilters({ filters, onFiltersChange, categories, maxPrice 
             <span className="inline-flex items-center gap-1 px-2 py-1 bg-secondary text-sm rounded">
               {filters.category}
               <button onClick={() => updateFilter('category', 'all')} className="hover:text-destructive">
+                <X className="h-3 w-3" />
+              </button>
+            </span>
+          )}
+          {filters.brand !== 'all' && (
+            <span className="inline-flex items-center gap-1 px-2 py-1 bg-secondary text-sm rounded">
+              Brand: {filters.brand}
+              <button onClick={() => updateFilter('brand', 'all')} className="hover:text-destructive">
+                <X className="h-3 w-3" />
+              </button>
+            </span>
+          )}
+          {filters.minRating > 0 && (
+            <span className="inline-flex items-center gap-1 px-2 py-1 bg-secondary text-sm rounded">
+              {filters.minRating}+ ★
+              <button onClick={() => updateFilter('minRating', 0)} className="hover:text-destructive">
+                <X className="h-3 w-3" />
+              </button>
+            </span>
+          )}
+          {filters.inStockOnly && (
+            <span className="inline-flex items-center gap-1 px-2 py-1 bg-secondary text-sm rounded">
+              In Stock
+              <button onClick={() => updateFilter('inStockOnly', false)} className="hover:text-destructive">
                 <X className="h-3 w-3" />
               </button>
             </span>
