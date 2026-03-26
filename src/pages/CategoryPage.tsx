@@ -72,6 +72,16 @@ const categoryImages: Record<string, string> = {
   'Garden & Outdoor': 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=1200&h=400&fit=crop',
 };
 
+function deriveSubcategory(name: string): string {
+  const parts = name.split(' ');
+  if (parts.length < 2) return 'Other';
+  // Second word is usually the product type
+  const subcat = parts[1];
+  // Filter out very short or numeric tokens
+  if (!subcat || subcat.length < 2 || /^\d+$/.test(subcat)) return 'Other';
+  return subcat;
+}
+
 export default function CategoryPage() {
   const { category } = useParams<{ category: string }>();
   const [products, setProducts] = useState<Product[]>([]);
