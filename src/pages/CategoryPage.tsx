@@ -87,6 +87,7 @@ export default function CategoryPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedSubcategory, setSelectedSubcategory] = useState<string>('all');
   const [filters, setFilters] = useState<FilterState>({
     search: '',
     category: 'all',
