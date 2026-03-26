@@ -124,7 +124,23 @@ export default function CategoryPage() {
 
     loadProducts();
     setCurrentPage(1);
+    setSelectedSubcategory('all');
   }, [decodedCategory]);
+
+  // Derive subcategories from product names
+  const subcategories = useMemo(() => {
+    const subcatCounts = new Map<string, number>();
+    products.forEach(p => {
+      const sub = deriveSubcategory(p.name);
+      subcatCounts.set(sub, (subcatCounts.get(sub) || 0) + 1);
+    });
+    // Only show subcategories with 5+ products, sorted by count
+    return [...subcatCounts.entries()]
+      .filter(([name, count]) => count >= 5 && name !== 'Other')
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 15)
+      .map(([name]) => name);
+  }, [products]);
 
   const brands = useMemo(() => {
     const brandSet = new Set<string>();
@@ -142,6 +158,11 @@ export default function CategoryPage() {
 
   const filteredProducts = useMemo(() => {
     let result = [...products];
+
+    // Subcategory filter
+    if (selectedSubcategory !== 'all') {
+      result = result.filter(p => deriveSubcategory(p.name) === selectedSubcategory);
+    }
 
     if (filters.search) {
       const searchLower = filters.search.toLowerCase();
