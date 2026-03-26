@@ -213,7 +213,7 @@ export default function CategoryPage() {
     }
 
     return result;
-  }, [products, filters]);
+  }, [products, filters, selectedSubcategory]);
 
   const totalPages = Math.ceil(filteredProducts.length / PRODUCTS_PER_PAGE);
   const paginatedProducts = filteredProducts.slice(
