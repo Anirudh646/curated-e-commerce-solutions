@@ -291,6 +291,35 @@ export default function CategoryPage() {
                   </p>
                 </div>
 
+                {/* Subcategory Chips */}
+                {subcategories.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mb-6">
+                    <button
+                      onClick={() => { setSelectedSubcategory('all'); setCurrentPage(1); }}
+                      className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                        selectedSubcategory === 'all'
+                          ? 'bg-primary text-primary-foreground'
+                          : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
+                      }`}
+                    >
+                      All
+                    </button>
+                    {subcategories.map((sub) => (
+                      <button
+                        key={sub}
+                        onClick={() => { setSelectedSubcategory(sub); setCurrentPage(1); }}
+                        className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                          selectedSubcategory === sub
+                            ? 'bg-primary text-primary-foreground'
+                            : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
+                        }`}
+                      >
+                        {sub}
+                      </button>
+                    ))}
+                  </div>
+                )}
+
                 <ProductFilters
                   filters={{ ...filters, category: 'all' }}
                   onFiltersChange={(newFilters) => setFilters({ ...newFilters, category: 'all' })}
