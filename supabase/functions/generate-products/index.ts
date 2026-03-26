@@ -265,7 +265,7 @@ const productData: Record<string, {
     images: [
       'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=400',
       'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=400',
-      'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400',
+      'https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=400',
       'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=400',
       'https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=400',
       'https://images.unsplash.com/photo-1593642632559-0c6d3fc62b89?w=400',
