@@ -40,6 +40,17 @@ const categoryDescriptions: Record<string, string> = {
   Home: 'Transform your living space with our curated home décor and essentials.',
   Accessories: 'Complete your look with stylish accessories - bags, jewelry, and more.',
   Sports: 'Gear up for your active lifestyle with quality sports and fitness equipment.',
+  Beauty: 'Explore premium skincare, makeup, and beauty essentials for every skin type.',
+  Kitchen: 'Find the best cookware, appliances, and kitchen essentials for Indian cooking.',
+  Books: 'Discover bestsellers, academic texts, and captivating reads across all genres.',
+  Toys: 'Fun and educational toys for children of all ages - safe and engaging.',
+  Footwear: 'Step out in style with shoes, sandals, and sneakers for every occasion.',
+  Groceries: 'Shop fresh groceries, spices, and pantry staples delivered to your door.',
+  Automotive: 'Premium car accessories, tools, and auto care products for every vehicle.',
+  'Health & Wellness': 'Supplements, fitness gear, and wellness products for a healthier you.',
+  Stationery: 'Quality pens, notebooks, art supplies, and office essentials.',
+  'Pet Supplies': 'Everything your furry friend needs - food, toys, grooming, and more.',
+  'Garden & Outdoor': 'Plants, garden tools, and outdoor living essentials for green thumbs.',
 };
 
 const categoryImages: Record<string, string> = {
@@ -47,7 +58,18 @@ const categoryImages: Record<string, string> = {
   Electronics: 'https://images.unsplash.com/photo-1498049794561-7780e7231661?w=1200&h=400&fit=crop',
   Home: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=1200&h=400&fit=crop',
   Accessories: 'https://images.unsplash.com/photo-1523293182086-7651a899d37f?w=1200&h=400&fit=crop',
-  Sports: 'https://images.unsplash.com/photo-1461896836934- voices?w=1200&h=400&fit=crop',
+  Sports: 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=1200&h=400&fit=crop',
+  Beauty: 'https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=1200&h=400&fit=crop',
+  Kitchen: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=1200&h=400&fit=crop',
+  Books: 'https://images.unsplash.com/photo-1512820790803-83ca734da794?w=1200&h=400&fit=crop',
+  Toys: 'https://images.unsplash.com/photo-1558060370-d644479cb6f7?w=1200&h=400&fit=crop',
+  Footwear: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=1200&h=400&fit=crop',
+  Groceries: 'https://images.unsplash.com/photo-1506617420156-8e4536971650?w=1200&h=400&fit=crop',
+  Automotive: 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=1200&h=400&fit=crop',
+  'Health & Wellness': 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=1200&h=400&fit=crop',
+  Stationery: 'https://images.unsplash.com/photo-1456735190827-d1262f71b8a3?w=1200&h=400&fit=crop',
+  'Pet Supplies': 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?w=1200&h=400&fit=crop',
+  'Garden & Outdoor': 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=1200&h=400&fit=crop',
 };
 
 export default function CategoryPage() {
@@ -231,6 +253,9 @@ export default function CategoryPage() {
                 <div className="flex items-center justify-between mb-6">
                   <p className="text-muted-foreground">
                     Showing {paginatedProducts.length} of {filteredProducts.length} products
+                    {filteredProducts.length !== products.length && (
+                      <span className="ml-1">({products.length} total in {decodedCategory})</span>
+                    )}
                   </p>
                 </div>
 
