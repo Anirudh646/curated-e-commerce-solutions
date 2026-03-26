@@ -72,11 +72,22 @@ const categoryImages: Record<string, string> = {
   'Garden & Outdoor': 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=1200&h=400&fit=crop',
 };
 
+function deriveSubcategory(name: string): string {
+  const parts = name.split(' ');
+  if (parts.length < 2) return 'Other';
+  // Second word is usually the product type
+  const subcat = parts[1];
+  // Filter out very short or numeric tokens
+  if (!subcat || subcat.length < 2 || /^\d+$/.test(subcat)) return 'Other';
+  return subcat;
+}
+
 export default function CategoryPage() {
   const { category } = useParams<{ category: string }>();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedSubcategory, setSelectedSubcategory] = useState<string>('all');
   const [filters, setFilters] = useState<FilterState>({
     search: '',
     category: 'all',
@@ -113,7 +124,23 @@ export default function CategoryPage() {
 
     loadProducts();
     setCurrentPage(1);
+    setSelectedSubcategory('all');
   }, [decodedCategory]);
+
+  // Derive subcategories from product names
+  const subcategories = useMemo(() => {
+    const subcatCounts = new Map<string, number>();
+    products.forEach(p => {
+      const sub = deriveSubcategory(p.name);
+      subcatCounts.set(sub, (subcatCounts.get(sub) || 0) + 1);
+    });
+    // Only show subcategories with 5+ products, sorted by count
+    return [...subcatCounts.entries()]
+      .filter(([name, count]) => count >= 5 && name !== 'Other')
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 15)
+      .map(([name]) => name);
+  }, [products]);
 
   const brands = useMemo(() => {
     const brandSet = new Set<string>();
@@ -131,6 +158,11 @@ export default function CategoryPage() {
 
   const filteredProducts = useMemo(() => {
     let result = [...products];
+
+    // Subcategory filter
+    if (selectedSubcategory !== 'all') {
+      result = result.filter(p => deriveSubcategory(p.name) === selectedSubcategory);
+    }
 
     if (filters.search) {
       const searchLower = filters.search.toLowerCase();
@@ -181,7 +213,7 @@ export default function CategoryPage() {
     }
 
     return result;
-  }, [products, filters]);
+  }, [products, filters, selectedSubcategory]);
 
   const totalPages = Math.ceil(filteredProducts.length / PRODUCTS_PER_PAGE);
   const paginatedProducts = filteredProducts.slice(
@@ -258,6 +290,35 @@ export default function CategoryPage() {
                     )}
                   </p>
                 </div>
+
+                {/* Subcategory Chips */}
+                {subcategories.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mb-6">
+                    <button
+                      onClick={() => { setSelectedSubcategory('all'); setCurrentPage(1); }}
+                      className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                        selectedSubcategory === 'all'
+                          ? 'bg-primary text-primary-foreground'
+                          : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
+                      }`}
+                    >
+                      All
+                    </button>
+                    {subcategories.map((sub) => (
+                      <button
+                        key={sub}
+                        onClick={() => { setSelectedSubcategory(sub); setCurrentPage(1); }}
+                        className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                          selectedSubcategory === sub
+                            ? 'bg-primary text-primary-foreground'
+                            : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
+                        }`}
+                      >
+                        {sub}
+                      </button>
+                    ))}
+                  </div>
+                )}
 
                 <ProductFilters
                   filters={{ ...filters, category: 'all' }}
