@@ -8,6 +8,7 @@ import { Footer } from '@/components/Footer';
 import { ImageZoom } from '@/components/ImageZoom';
 import { RecentlyViewed } from '@/components/RecentlyViewed';
 import { ProductReviews } from '@/components/ProductReviews';
+import { RelatedProducts } from '@/components/RelatedProducts';
 import { CompareButton } from '@/components/CompareButton';
 import { supabase } from '@/integrations/supabase/client';
 import { useStore } from '@/lib/store';
@@ -373,6 +374,13 @@ export default function LocalProductDetail() {
         <div className="mt-16">
           <ProductReviews productId={product.id} />
         </div>
+
+        {/* Related Products */}
+        <RelatedProducts
+          productId={product.id}
+          category={product.category}
+          price={product.price}
+        />
       </main>
       
       {/* Recently Viewed Section */}
