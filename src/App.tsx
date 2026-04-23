@@ -15,6 +15,8 @@ import LocalProductDetail from "./pages/LocalProductDetail";
 import CategoryPage from "./pages/CategoryPage";
 import Auth from "./pages/Auth";
 import Profile from "./pages/Profile";
+import Deals from "./pages/Deals";
+import Orders from "./pages/Orders";
 import AdminDashboard from "./pages/admin/Dashboard";
 import AdminProducts from "./pages/admin/Products";
 import AdminOrders from "./pages/admin/Orders";
@@ -63,6 +65,7 @@ const AppRoutes = () => (
   <Routes>
     <Route path="/" element={<Index />} />
     <Route path="/category/:category" element={<CategoryPage />} />
+    <Route path="/deals" element={<Deals />} />
     <Route path="/product/:handle" element={<ShopifyProductDetail />} />
     <Route path="/local-product/:id" element={<LocalProductDetail />} />
     <Route path="/shopify-cart" element={<ShopifyCart />} />
@@ -81,6 +84,14 @@ const AppRoutes = () => (
       element={
         <ProtectedRoute>
           <Profile />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path="/orders"
+      element={
+        <ProtectedRoute>
+          <Orders />
         </ProtectedRoute>
       }
     />

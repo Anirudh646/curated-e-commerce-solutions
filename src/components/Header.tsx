@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, ShoppingBag, Heart, Menu, X, User, LogOut, Shield } from 'lucide-react';
+import { Search, ShoppingBag, Heart, Menu, X, User, LogOut, Shield, Flame, Package } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -50,11 +50,27 @@ export function Header() {
                 Home
               </Link>
               <Link
+                to="/deals"
+                className="text-lg font-medium transition-colors hover:text-accent text-foreground flex items-center gap-2"
+              >
+                <Flame className="h-5 w-5 text-destructive" />
+                Deals
+              </Link>
+              <Link
                 to="/cart"
                 className="text-lg font-medium transition-colors hover:text-accent text-foreground"
               >
                 Cart
               </Link>
+              {user && (
+                <Link
+                  to="/orders"
+                  className="text-lg font-medium transition-colors hover:text-accent text-foreground flex items-center gap-2"
+                >
+                  <Package className="h-5 w-5" />
+                  My Orders
+                </Link>
+              )}
               {isAdmin && (
                 <>
                   <div className="h-px bg-border my-2" />
@@ -84,6 +100,13 @@ export function Header() {
             className="text-sm font-medium transition-colors hover:text-accent text-muted-foreground"
           >
             Home
+          </Link>
+          <Link
+            to="/deals"
+            className="text-sm font-medium transition-colors hover:text-accent text-muted-foreground inline-flex items-center gap-1"
+          >
+            <Flame className="h-4 w-4 text-destructive" />
+            Deals
           </Link>
           <Link
             to="/cart"
@@ -169,6 +192,12 @@ export function Header() {
                   <Link to="/profile" className="flex items-center">
                     <User className="h-4 w-4 mr-2" />
                     My Account
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/orders" className="flex items-center">
+                    <Package className="h-4 w-4 mr-2" />
+                    My Orders
                   </Link>
                 </DropdownMenuItem>
                 {isAdmin && (
