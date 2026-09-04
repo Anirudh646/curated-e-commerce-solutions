@@ -8,6 +8,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { QuickViewModal } from '@/components/QuickViewModal';
 import { CompareButton } from '@/components/CompareButton';
+import { fallbackImage, productImage } from '@/lib/images';
 
 interface LocalProduct {
   id: string;
@@ -101,7 +102,7 @@ export function LocalProductCard({ product, onImageClick }: LocalProductCardProp
     ? Math.round(((product.original_price - product.price) / product.original_price) * 100)
     : null;
 
-  const mainImage = product.image_url || product.images?.[0];
+  const mainImage = productImage(product.image_url || product.images?.[0], product.category);
 
   return (
     <>
@@ -115,19 +116,19 @@ export function LocalProductCard({ product, onImageClick }: LocalProductCardProp
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
         >
-          {mainImage ? (
-            <img
-              src={mainImage}
-              alt={product.name}
-              className={`h-full w-full object-cover transition-transform duration-500 ${
-                isHovered ? 'scale-110' : 'scale-100'
-              }`}
-            />
-          ) : (
-            <div className="h-full w-full flex items-center justify-center text-muted-foreground">
-              No Image
-            </div>
-          )}
+          <img
+            src={mainImage}
+            alt={product.name}
+            loading="lazy"
+            onError={(e) => {
+              const img = e.currentTarget as HTMLImageElement;
+              const fb = fallbackImage(product.category);
+              if (img.src !== fb) img.src = fb;
+            }}
+            className={`h-full w-full object-cover transition-transform duration-500 ${
+              isHovered ? 'scale-110' : 'scale-100'
+            }`}
+          />
 
           {/* Badge */}
           {product.badge && (
