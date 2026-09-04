@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, ShoppingBag, Heart, Menu, X, User, LogOut, Shield, Flame, Package } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -17,6 +17,7 @@ import { useShopifyCartStore } from '@/stores/shopifyCartStore';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAdmin } from '@/contexts/AdminContext';
 import { toast } from 'sonner';
+import { SearchCommand } from '@/components/SearchCommand';
 
 export function Header() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -25,6 +26,17 @@ export function Header() {
   const { user, signOut } = useAuth();
   const { isAdmin } = useAdmin();
   const cartCount = getShopifyCartCount();
+
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        setIsSearchOpen((prev) => !prev);
+      }
+    };
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, []);
 
   const handleSignOut = async () => {
     await signOut();
