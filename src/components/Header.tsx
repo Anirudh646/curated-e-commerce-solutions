@@ -241,6 +241,7 @@ export function Header() {
           )}
         </div>
       </div>
+      <SearchCommand open={isSearchOpen} onOpenChange={setIsSearchOpen} />
     </header>
   );
 }
