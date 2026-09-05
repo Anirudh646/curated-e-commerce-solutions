@@ -130,25 +130,30 @@ export function Header() {
 
         {/* Actions */}
         <div className="flex items-center gap-2">
-          {/* Search - hidden for now since Shopify has its own search */}
-          <div className={`${isSearchOpen ? 'flex' : 'hidden'} md:hidden items-center`}>
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                placeholder="Search products..."
-                className="w-[200px] pl-9 bg-secondary border-0"
-              />
-            </div>
-          </div>
+          {/* Search trigger (desktop) */}
+          <button
+            onClick={() => setIsSearchOpen(true)}
+            className="hidden md:flex items-center gap-2 rounded-md border border-border bg-secondary/60 px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
+            aria-label="Search products"
+          >
+            <Search className="h-4 w-4" />
+            <span>Search products</span>
+            <kbd className="ml-2 rounded border border-border px-1.5 py-0.5 text-[10px] font-medium">
+              ⌘K
+            </kbd>
+          </button>
 
+          {/* Search trigger (mobile) */}
           <Button
             variant="ghost"
             size="icon"
             className="md:hidden"
-            onClick={() => setIsSearchOpen(!isSearchOpen)}
+            aria-label="Search products"
+            onClick={() => setIsSearchOpen(true)}
           >
-            {isSearchOpen ? <X className="h-5 w-5" /> : <Search className="h-5 w-5" />}
+            <Search className="h-5 w-5" />
           </Button>
+
 
           {/* Admin Link (Desktop) */}
           {isAdmin && (
