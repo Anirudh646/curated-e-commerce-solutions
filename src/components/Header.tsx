@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, ShoppingBag, Heart, Menu, X, User, LogOut, Shield, Flame, Package } from 'lucide-react';
+import { Search, ShoppingBag, Heart, Menu, User, LogOut, Shield, Flame, Package } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Badge } from '@/components/ui/badge';
 import {
